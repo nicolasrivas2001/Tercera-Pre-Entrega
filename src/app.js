@@ -2,9 +2,12 @@ import express from "express";
 import { engine } from "express-handlebars";
 import { __dirname } from "./utils.js";
 import viewsRouter from "./routes/views.router.js";
-import viewsProducts from "./routes/products.router.js";
+import productsRouter from "./routes/products.router.js";
+import cartsRouter from "./routes/cart.router.js"
+import { messagesManager } from "./db/managers/messagesManager.js";
 import { Server } from "socket.io";
-import { manager } from "../Entrega2.js";
+import "./db/configDB.js";
+
 
 const app = express();
 
@@ -17,8 +20,9 @@ app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", __dirname + "/views");
 
-app.use("/api/views", viewsRouter);
-app.use("/", viewsProducts);
+app.use("/api/products", productsRouter);
+app.use("/", viewsRouter);
+app.use("/api/carts", cartsRouter);
 
 
 const httpServer = app.listen(8080, () => {
@@ -27,8 +31,13 @@ const httpServer = app.listen(8080, () => {
 
 const socketServer = new Server(httpServer);
 socketServer.on("connection", (socket) => {
-  
-  socket.on("newPrice", (value) => {
+  socket.on("newMessage", async(message) => {
+    await messagesManager.createOne(message)
+    const messages = await messagesManager.findAll()
+    socketServer.emit("sendMessage", messages);
+  });
+
+  /*socket.on("newPrice", (value) => {
     socket.broadcast.emit("priceUpdated", value);
   });
 
@@ -47,5 +56,5 @@ socketServer.on("connection", (socket) => {
     await manager.deleteProduct(+id)
     const products = await manager.getProducts({})
     socketServer.emit("productUpdated", products);
-  });
+  });*/
 });
