@@ -10,9 +10,33 @@ router.get("/", async (req, res) => {
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
-  });
+});
   
-  router.post("/", async (req, res) => {
+router.get("/:pid", async (req, res) => {
+  try {
+    const {pid} = req.params
+    const product = await productsManager.findById(pid);
+    res.status(200).json({ product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/:pid", async (req, res) => {
+  try {
+    const {pid} = req.params
+    const data = req.body
+    console.log(data,pid)
+    const product = await productsManager.updateOne(pid,data);
+    res.status(200).json({ product });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+router.post("/", async (req, res) => {
     try {
       const createdProduct = await productsManager.createOne(req.body);
       res
@@ -21,9 +45,9 @@ router.get("/", async (req, res) => {
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
-  });
+});
   
-  router.delete("/:idProduct", async (req, res) => {
+router.delete("/:idProduct", async (req, res) => {
     const { idProduct } = req.params;
     try {
       await productsManager.deleteOne(idProduct);
@@ -31,6 +55,6 @@ router.get("/", async (req, res) => {
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
-  });
+});
   
   export default router;

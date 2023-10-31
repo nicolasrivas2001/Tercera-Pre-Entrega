@@ -16,7 +16,7 @@ formChat.onsubmit = (e) => {
 
 socketClient.on("sendMessage", (messages) => {
     const newMessages = messages.map(m=>{
-        const mess =  `<div>${m.user}</div>
+        const mess =  `<h3>${m.user}</h3>
         <div>${m.message}</div>`
         return mess
     }).join(" ")

@@ -16,8 +16,10 @@ class CartsManager {
 
   async addProductToCart(idCart, idProduct) {
     const cart = await cartsModel.findById(idCart);
-
-    const productIndex = cart.products.findIndex((p) =>
+    if(!cart){
+      return("No existe este id de producto")
+    } else{
+      const productIndex = cart.products.findIndex((p) =>
       p.product.equals(idProduct)
     );
 
@@ -27,6 +29,7 @@ class CartsManager {
       cart.products[productIndex].quantity++;
     }
     return cart.save();
+    }
   }
 }
 
