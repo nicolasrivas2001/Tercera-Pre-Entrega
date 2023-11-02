@@ -5,6 +5,8 @@ import viewsRouter from "./routes/views.router.js";
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/cart.router.js"
 import { messagesManager } from "./db/managers/messagesManager.js";
+import { productsManager } from "./db/managers/productsManager.js";
+import { cartsManager } from "./db/managers/cartsManager.js";
 import { Server } from "socket.io";
 import "./db/configDB.js";
 
@@ -36,6 +38,12 @@ socketServer.on("connection", (socket) => {
     const messages = await messagesManager.findAll()
     socketServer.emit("sendMessage", messages);
   });
+
+  socket.on("showProducts", async() => {
+    const products = await productsManager.findAll({limit:10, page:1, sort:{}, query:{} })
+    socketServer.emit("sendProducts", products);
+  });
+
 
   /*socket.on("newPrice", (value) => {
     socket.broadcast.emit("priceUpdated", value);
