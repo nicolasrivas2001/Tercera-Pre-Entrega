@@ -42,4 +42,20 @@ router.get("/carts/:cid", async(req,res)=>{
   }
 })
 
+
+//Entrega 19
+
+router.get("/login",(req,res)=>{
+  res.render("login")
+})
+
+router.get("/signup",(req,res)=>{
+  res.render("signup")
+})
+router.get("/profile",(req,res)=>{
+  res.render("profile")
+})
+
+
+
 export default router;
