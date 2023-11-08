@@ -5,8 +5,8 @@ import { productsManager } from "../db/managers/productsManager.js";
 const router = Router()
 
 router.post("/signup", async(req,res)=>{
-    const { first_name, last_name, email, password } = req.body;
-    if (!first_name || !last_name || !email || !password) {
+    const { firstName, lastName, email, password } = req.body;
+    if (!firstName || !lastName || !email || !password) {
         return res.status(400).json({ message: "Some data is missing" });
     }
     try {
@@ -34,16 +34,22 @@ router.post("/login", async(req,res)=>{
             return res.status(401).json({message:"Password is not valid"})
         }
         const sessionInfo = email === "adminCoder@coder.com" && password === "adminCod3r123" ?
-        {email, first_name:user.first_name, isAdmin: true}
-        : {email, first_name:user.first_name, isAdmin: false}
+        {email, firstName:user.firstName, isAdmin: true}
+        : {email, firstName:user.firstName, isAdmin: false}
         
         req.session.user = sessionInfo
-        const products = await productsManager.findAll({limit:10, page:1, sort:{}, query:{} }).lean()
+        const products = await productsManager.findAll({limit:10, page:1, sort:{}, query:{} })
         const docs = products.payload.docs
-        res.render("products",{products: docs});
+        res.render("products",{products: docs,user:user.firstName});
     } catch (error) {
         res.status(500).json({error:error})
     }
+})
+
+router.get("/signout", async(req,res)=>{
+    req.session.destroy(()=>{
+        res.redirect("/login")
+    })
 })
 
 export default router;

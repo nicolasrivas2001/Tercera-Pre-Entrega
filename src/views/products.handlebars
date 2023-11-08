@@ -6,6 +6,7 @@
     <title>Products</title>
 </head>
 <body>
+    <h1>Hola {{user}}</h1>
     <ul>
     {{#each products}}
       <li>{{name}}</li>
@@ -14,5 +15,6 @@
       <li>{{description}}</li>
     {{/each}}
   </ul>
+  <button><a href="/api/sessions/signout">Sign Out</a></button>
 </body>
 </html>

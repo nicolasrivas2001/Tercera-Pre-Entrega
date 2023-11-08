@@ -16,7 +16,14 @@ import cookieParser from "cookie-parser";
 
 
 const app = express();
-
+const URI = `mongodb+srv://nicolasrivass2001:oKiRuu3uaSSVpxgc@cluster0.edas4ca.mongodb.net/ecommerce?retryWrites=true&w=majority`
+app.use(session({
+  store: new MongoStore({
+    mongoUrl:URI
+  }),
+  secret: "secretSession",
+  cookie: {maxAge:60000},
+}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
@@ -35,14 +42,7 @@ app.use("/api/sessions", sessionsRouter);
 
 
 
-const URI = `mongodb+srv://nicolasrivass2001:oKiRuu3uaSSVpxgc@cluster0.edas4ca.mongodb.net/ecommerce?retryWrites=true&w=majority`
-app.use(session({
-  store: new MongoStore({
-    mongoUrl:URI
-  }),
-  secret: "secretSession",
-  cookie: {maxAge:60000},
-}))
+
 
 
 const httpServer = app.listen(8088, () => {
