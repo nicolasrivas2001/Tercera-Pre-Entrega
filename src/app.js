@@ -13,6 +13,8 @@ import { Server } from "socket.io";
 import "./db/configDB.js";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
+import passport from "passport";
+import "./passport.js"
 
 
 const app = express();
@@ -28,6 +30,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
 app.use(cookieParser("SecretCookie"))
+
+//passport
+app.use(passport.initialize())
+app.use(passport.session())
 
 // handlebars
 app.engine("handlebars", engine());

@@ -52,10 +52,10 @@ router.get("/login",(req,res)=>{
 router.get("/signup",(req,res)=>{
   res.render("signup")
 })
-router.get("/profile",(req,res)=>{
-  res.render("profile")
+
+
+router.get("/error",(req,res)=>{
+  res.render("/error")
 })
-
-
 
 export default router;

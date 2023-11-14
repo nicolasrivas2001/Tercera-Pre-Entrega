@@ -1,18 +1,24 @@
 import { Router } from "express";
 import { usersManager } from "../db/managers/usersManager.js";
 import { productsManager } from "../db/managers/productsManager.js";
+import {hashData, compareData} from "../utils.js"
+import passport from "passport";
 
 const router = Router()
 
-router.post("/signup", async(req,res)=>{
+/*router.post("/signup", async(req,res)=>{
     const { firstName, lastName, email, password } = req.body;
     if (!firstName || !lastName || !email || !password) {
         return res.status(400).json({ message: "Some data is missing" });
     }
     try {
-        const createdUser = await usersManager.createOne(req.body)
+        const hashedPassword = await hashData(password)
+        const createdUser = await usersManager.createOne({
+            ...req.body,
+            password: hashedPassword})
         res.status(200).json({message:"User created", user:createdUser})
     } catch (error) {
+        console.log(error)
         res.status(500).json({error})
     }
 })
@@ -24,12 +30,12 @@ router.post("/login", async(req,res)=>{
     }
     try {
         const user = await usersManager.findByEmail(email)
-        console.log("user",user)
         if (!user){
             return res.redirect("/signup")
         }
         
-        const isPasswordValid = password === user.password
+        //const isPasswordValid = password === user.password
+        const isPasswordValid = await compareData(password, user.password)
         if(!isPasswordValid){
             return res.status(401).json({message:"Password is not valid"})
         }
@@ -45,12 +51,34 @@ router.post("/login", async(req,res)=>{
         res.status(500).json({error:error})
     }
 })
+*/
+
+router.post("/signup",passport.authenticate("signup"),(req,res)=>{
+    res.send("Probando passport signup")
+})
+
+router.post("/login",passport.authenticate("login"),(req,res)=>{
+    res.send("Probando passport login")
+})
+
 
 router.get("/signout", async(req,res)=>{
     req.session.destroy(()=>{
         res.redirect("/login")
     })
 })
+
+//github
+
+router.get("/auth/github",
+    passport.authenticate("github", {scope: ["user.email"]})
+)
+
+router.get("/callback",
+    passport.authenticate("github"), (req,res)=>{
+        res.send("Probando")
+    }
+)
 
 export default router;
 
