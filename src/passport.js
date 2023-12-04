@@ -3,6 +3,8 @@ import {usersManager} from "./db/managers/usersManager.js"
 import { Strategy as GithubStrategy } from "passport-github2";
 import { Strategy as LocalStrategy} from "passport-local"
 import { hashData, compareData} from "./utils.js";
+import { ExtractJwt, Strategy as JWTStrategy } from "passport-jwt";
+const SECRETJWT = "jwtSecret";
 
 passport.serializeUser((user,done)=>{
     done(null,user._id)
@@ -45,7 +47,7 @@ passport.use("login", new LocalStrategy({usernameField:"email"}, async(email,pas
         }
         
         //const isPasswordValid = password === user.password
-        const isPasswordValid = await compareData(password, user.password)
+        const isPasswordValid = await compareData(user.password,password)
         if(!isPasswordValid){
             done(null,false)
         }
@@ -82,3 +84,20 @@ passport.use("github", new GithubStrategy({
         done(error)
     }
 }))
+
+const fromCookies = (req) => {
+    return req.cookies.token;
+  };
+  
+passport.use(
+    "jwt",
+    new JWTStrategy(
+      {
+        jwtFromRequest: ExtractJwt.fromExtractors([fromCookies]),
+        secretOrKey: SECRETJWT,
+      },
+      (jwt_payload, done) => {
+        done(null, jwt_payload);
+      }
+    )
+);

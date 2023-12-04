@@ -1,14 +1,21 @@
 import { Router } from "express";
 import { usersManager } from "../db/managers/usersManager.js";
 import { productsManager } from "../db/managers/productsManager.js";
+import { generateToken } from "../utils.js";
 import {hashData, compareData} from "../utils.js"
 import passport from "passport";
 
 const router = Router()
 
-/*router.post("/signup", async(req,res)=>{
-    const { firstName, lastName, email, password } = req.body;
-    if (!firstName || !lastName || !email || !password) {
+router.get("/current", passport.authenticate("jwt", {session: false}), async(req,res)=>{
+    const user = req.user
+    res.json({user})
+    
+})
+
+router.post("/signup", async(req,res)=>{
+    const { first_name, last_name, email, password, rol } = req.body;
+    if (!first_name || !last_name || !email || !password) {
         return res.status(400).json({ message: "Some data is missing" });
     }
     try {
@@ -18,7 +25,6 @@ const router = Router()
             password: hashedPassword})
         res.status(200).json({message:"User created", user:createdUser})
     } catch (error) {
-        console.log(error)
         res.status(500).json({error})
     }
 })
@@ -39,33 +45,15 @@ router.post("/login", async(req,res)=>{
         if(!isPasswordValid){
             return res.status(401).json({message:"Password is not valid"})
         }
-        const sessionInfo = email === "adminCoder@coder.com" && password === "adminCod3r123" ?
-        {email, firstName:user.firstName, isAdmin: true}
-        : {email, firstName:user.firstName, isAdmin: false}
-        
-        req.session.user = sessionInfo
-        const products = await productsManager.findAll({limit:10, page:1, sort:{}, query:{} })
-        const docs = products.payload.docs
-        res.render("products",{products: docs,user:user.firstName});
+        //const products = await productsManager.findAll({limit:10, page:1, sort:{}, query:{} })
+        //const docs = products.payload.docs
+        //res.render("products",{products: docs,user:user.firstName});
+        const token = generateToken({email,password});
+        res.cookie("token", token, { maxAge: 60000, httpOnly: true }).send("Welcome");
     } catch (error) {
+        console.log(error)
         res.status(500).json({error:error})
     }
-})
-*/
-
-router.post("/signup",passport.authenticate("signup"),(req,res)=>{
-    res.send("Probando passport signup")
-})
-
-router.post("/login",passport.authenticate("login"),(req,res)=>{
-    res.send("Probando passport login")
-})
-
-
-router.get("/signout", async(req,res)=>{
-    req.session.destroy(()=>{
-        res.redirect("/login")
-    })
 })
 
 //github

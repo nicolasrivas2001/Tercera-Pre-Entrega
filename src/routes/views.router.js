@@ -3,7 +3,7 @@ import { cartsManager } from "../db/managers/cartsManager.js";
 import { productsManager } from "../db/managers/productsManager.js";
 
 const router = Router();
-
+/*
 router.get("/", (req, res) => {
   res.render("websocket");
 });
@@ -41,9 +41,7 @@ router.get("/carts/:cid", async(req,res)=>{
     return error
   }
 })
-
-
-//Entrega 19
+*/
 
 router.get("/login",(req,res)=>{
   res.render("login")
