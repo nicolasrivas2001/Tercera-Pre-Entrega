@@ -19,40 +19,44 @@ passport.deserializeUser(async(id,done)=>{
     }
 })
 
-passport.use("signup", new LocalStrategy({passReqToCallback: true, usernameField:"email"}, async(req,email,password,done) => {
-    const { firstName, lastName } = req.body;
-    if (!firstName || !lastName || !email || !password) {
+passport.use("signup", new LocalStrategy({passReqToCallback: true, usernameField:"email"}, async(req,done) => {
+    const { first_name, last_name, email, password, rol } = req.body;
+    if (!first_name || !last_name || !email || !password) {
         return done(null,false)
     }
     try {
         const hashedPassword = await hashData(password)
         const createdUser = await usersManager.createOne({
-        ...req.body,
-        password: hashedPassword})
+            ...req.body,
+            password: hashedPassword})
         done(null,createdUser)
     } catch (error) {
-        
+        done(error)
     }
 }
 ))
 
 passport.use("login", new LocalStrategy({usernameField:"email"}, async(email,password,done)=>{
     if ( !email || !password) {
-        done(null,false)
+        done(null,false,{ message: "All fields are required" })
     }
     try {
         const user = await usersManager.findByEmail(email)
         if (!user){
-            done(null,false)
+            return done(null, false, { message: "Incorrect email or password." })
         }
         
         //const isPasswordValid = password === user.password
-        const isPasswordValid = await compareData(user.password,password)
+        const isPasswordValid = await compareData(password, user.password)
         if(!isPasswordValid){
-            done(null,false)
+            return done(null, false, { message: "Incorrect email or password." })
         }
-        done(null,user)
-    } catch(error){
+        //const products = await productsManager.findAll({limit:10, page:1, sort:{}, query:{} })
+        //const docs = products.payload.docs
+        //res.render("products",{products: docs,user:user.firstName});
+        done(null, user);
+    } catch (error) {
+        console.log(error)
         done(error)
     }
 }))

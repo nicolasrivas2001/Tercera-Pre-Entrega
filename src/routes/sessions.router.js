@@ -13,47 +13,14 @@ router.get("/current", passport.authenticate("jwt", {session: false}), async(req
     
 })
 
-router.post("/signup", async(req,res)=>{
-    const { first_name, last_name, email, password, rol } = req.body;
-    if (!first_name || !last_name || !email || !password) {
-        return res.status(400).json({ message: "Some data is missing" });
-    }
-    try {
-        const hashedPassword = await hashData(password)
-        const createdUser = await usersManager.createOne({
-            ...req.body,
-            password: hashedPassword})
-        res.status(200).json({message:"User created", user:createdUser})
-    } catch (error) {
-        res.status(500).json({error})
-    }
+router.post("/signup",passport.authenticate("signup"), async(req,res)=>{
+    res.json({ message: "Signed up" });
 })
 
-router.post("/login", async(req,res)=>{
-    const { email, password } = req.body;
-    if ( !email || !password) {
-        return res.status(400).json({ message: "Some data is missing" });
-    }
-    try {
-        const user = await usersManager.findByEmail(email)
-        if (!user){
-            return res.redirect("/signup")
-        }
-        
-        //const isPasswordValid = password === user.password
-        const isPasswordValid = await compareData(password, user.password)
-        if(!isPasswordValid){
-            return res.status(401).json({message:"Password is not valid"})
-        }
-        //const products = await productsManager.findAll({limit:10, page:1, sort:{}, query:{} })
-        //const docs = products.payload.docs
-        //res.render("products",{products: docs,user:user.firstName});
-        const token = generateToken({email,password});
-        res.cookie("token", token, { maxAge: 60000, httpOnly: true }).send("Welcome");
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({error:error})
-    }
+router.post("/login",passport.authenticate("login"), async(req,res)=>{
+    const {first_name,email} = req.body
+    const token = generateToken({first_name,email});
+    res.cookie("token", token, { maxAge: 60000, httpOnly: true }).send("Welcome");
 })
 
 //github
