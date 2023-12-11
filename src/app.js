@@ -6,19 +6,21 @@ import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/cart.router.js"
 import usersRouter from "./routes/users.router.js"
 import sessionsRouter from "./routes/sessions.router.js"
-import { messagesManager } from "./db/managers/messagesManager.js";
-import { productsManager } from "./db/managers/productsManager.js";
+import { productsManager } from "./dao/products.dao.js";
 import session from "express-session";
 import { Server } from "socket.io";
-import "./db/configDB.js";
+import "./dao/configDB.js";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./passport.js"
+import config from "./config.js"
 
 
+
+const URI = config.mongo_uri
 const app = express();
-const URI = `mongodb+srv://nicolasrivass2001:oKiRuu3uaSSVpxgc@cluster0.edas4ca.mongodb.net/ecommerce?retryWrites=true&w=majority`
+
 app.use(session({
   store: new MongoStore({
     mongoUrl:URI
@@ -52,7 +54,7 @@ app.use("/api/sessions", sessionsRouter);
 
 
 const httpServer = app.listen(8088, () => {
-  console.log("Server is listening on port 8080");
+  console.log("Server is listening on port 8088");
 });
 
 const socketServer = new Server(httpServer);

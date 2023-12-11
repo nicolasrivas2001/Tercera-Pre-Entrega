@@ -1,10 +1,10 @@
 import passport from "passport";
-import {usersManager} from "./db/managers/usersManager.js"
+import { usersManager } from "./dao/users.dao.js";
 import { Strategy as GithubStrategy } from "passport-github2";
 import { Strategy as LocalStrategy} from "passport-local"
 import { hashData, compareData} from "./utils.js";
 import { ExtractJwt, Strategy as JWTStrategy } from "passport-jwt";
-const SECRETJWT = "jwtSecret";
+import config from "./config.js";
 
 passport.serializeUser((user,done)=>{
     done(null,user._id)
@@ -19,22 +19,22 @@ passport.deserializeUser(async(id,done)=>{
     }
 })
 
-passport.use("signup", new LocalStrategy({passReqToCallback: true, usernameField:"email"}, async(req,done) => {
+passport.use("signup", new LocalStrategy({ passReqToCallback: true, usernameField: "email" }, async (req, done) => {
     const { first_name, last_name, email, password, rol } = req.body;
     if (!first_name || !last_name || !email || !password) {
-        return done(null,false)
+      return done(null, false);
     }
     try {
-        const hashedPassword = await hashData(password)
-        const createdUser = await usersManager.createOne({
-            ...req.body,
-            password: hashedPassword})
-        done(null,createdUser)
+      const hashedPassword = await hashData(password);
+      const createdUser = await usersManager.createOne({
+        ...req.body,
+        password: hashedPassword,
+      });
+      return done(null, createdUser);
     } catch (error) {
-        done(error)
+      return done(error);
     }
-}
-))
+  }));
 
 passport.use("login", new LocalStrategy({usernameField:"email"}, async(email,password,done)=>{
     if ( !email || !password) {
@@ -98,7 +98,7 @@ passport.use(
     new JWTStrategy(
       {
         jwtFromRequest: ExtractJwt.fromExtractors([fromCookies]),
-        secretOrKey: SECRETJWT,
+        secretOrKey: config.secret_jwt,
       },
       (jwt_payload, done) => {
         done(null, jwt_payload);

@@ -1,4 +1,4 @@
-import { productsModel } from "../models/products.model.js";
+import { productsModel } from "./models/products.model.js";
 
 class ProductsManager {
   async findAll({limit = 10, page = 1, sort = {}, query = {} } = {}) {

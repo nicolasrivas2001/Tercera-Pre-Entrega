@@ -1,4 +1,4 @@
-import { usersModel } from "../models/users.model.js";
+import { usersModel } from "./models/users.model.js";
 
 class UsersManager {
   // async findAll() {
@@ -25,7 +25,7 @@ class UsersManager {
   }
 
   async findById(id) {
-    const response = await usersModel.findById(id).explain("executionStats");
+    const response = await usersModel.findById(id);
     return response;
   }
 

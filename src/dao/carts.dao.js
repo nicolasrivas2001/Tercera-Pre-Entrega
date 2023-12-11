@@ -1,6 +1,11 @@
-import { cartsModel } from "../models/carts.model.js";
+import { cartsModel } from "./models/carts.model.js";
 
 class CartsManager {
+
+  async findAll(){
+    const response = await cartsModel.find()
+    return response;
+  }
   async createCart() {
     const newCart = { products: [] };
     const response = await cartsModel.create(newCart);

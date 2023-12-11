@@ -1,8 +1,5 @@
 import { Router } from "express";
-import { usersManager } from "../db/managers/usersManager.js";
-import { productsManager } from "../db/managers/productsManager.js";
 import { generateToken } from "../utils.js";
-import {hashData, compareData} from "../utils.js"
 import passport from "passport";
 
 const router = Router()
