@@ -1,5 +1,5 @@
 import passport from "passport";
-import { usersManager } from "./dao/users.dao.js";
+import { usersManager } from "./dao/mongo/users.mongo.js";
 import { Strategy as GithubStrategy } from "passport-github2";
 import { Strategy as LocalStrategy} from "passport-local"
 import { hashData, compareData} from "./utils.js";
@@ -19,24 +19,36 @@ passport.deserializeUser(async(id,done)=>{
     }
 })
 
-passport.use("signup", new LocalStrategy({ passReqToCallback: true, usernameField: "email" }, async (req, done) => {
-    const { first_name, last_name, email, password, rol } = req.body;
-    if (!first_name || !last_name || !email || !password) {
-      return done(null, false);
-    }
-    try {
-      const hashedPassword = await hashData(password);
-      const createdUser = await usersManager.createOne({
-        ...req.body,
-        password: hashedPassword,
-      });
-      return done(null, createdUser);
-    } catch (error) {
-      return done(error);
-    }
-  }));
+passport.use(
+    "signup",
+    new LocalStrategy(
+      { passReqToCallback: true, usernameField: "email" },
+      async (req, res, password,  done) => {
+        const { first_name, last_name , email } = req.body;
+        if (!first_name || !last_name || !email || !password) {
+          return done(null, false);
+        }
+        try {
+            const user = await usersManager.findByEmail(email)
+            
+            if(!user){
+                const hashedPassword = await hashData(password);
+                const createdUser = await usersManager.create({
+                ...req.body,
+                role:email==="coder@admin.com"?"Admin":"User",
+                password: hashedPassword,
+                });
+                return done(null, createdUser);
+            }
+            return done(null,false,{message:"Usuario existente"})
+        } catch (error) {
+          done(error);
+        }
+      }
+    )
+  );
 
-passport.use("login", new LocalStrategy({usernameField:"email"}, async(email,password,done)=>{
+passport.use("login", new LocalStrategy({usernameField:"email"}, async (email,password,done)=> {
     if ( !email || !password) {
         done(null,false,{ message: "All fields are required" })
     }
@@ -64,10 +76,12 @@ passport.use("login", new LocalStrategy({usernameField:"email"}, async(email,pas
 passport.use("github", new GithubStrategy({
     clientID:"Iv1.c748f46a6f06769d",
     clientSecret: "d51347c54a2e0b3aa2b025ef296957770757c3b3",
-    callbackURL:"http://localhost:8088/api/sessions/callback"
+    callbackURL:"http://localhost:8080/api/sessions/callback"
 }, async(accessToke, refreshToken, profile, done) => {
     try{
+        console.log(profile)
         const userDB = await usersManager.findByEmail(profile._json.email)
+        console.log(userDB)
         if(userDB){
             if(userDB.isGithub){
                 return done(null,userDB)
@@ -76,13 +90,13 @@ passport.use("github", new GithubStrategy({
             }
         }
         const infoUser = {
-            firstName:profile._json.name.split(" ")[0],
-            lastName:profile._json.name.split(" ")[1],
-            email:"default@gmail.com",
+            first_name:profile._json.name.split(" ")[0],
+            last_name:profile._json.name.split(" ")[1],
+            email:profile._json.email,
             password:" ",
             isGithub: true
         }
-        const createdUser = await usersManager.createOne(infoUser)
+        const createdUser = await usersManager.create(infoUser)
         done(null,createdUser)
     }catch(error){
         done(error)

@@ -1,12 +1,12 @@
-import { usersModel } from "./models/users.model.js";
+import { usersModel } from "../models/users.model.js";
 
-class UsersManager {
+export default class UsersManager {
   // async findAll() {
   //   const response = await usersModel.find();
   //   return response;
   // }
   //Paginate
-  async findAll(obj) {
+  async get(obj) {
     const { limit = 20, page = 1, ...filter } = obj;
 
     const response = await usersModel.paginate(filter, { limit, page });
@@ -35,17 +35,17 @@ class UsersManager {
     return response;
   }
 
-  async createOne(obj) {
+  async create(obj) {
     const response = await usersModel.create(obj);
     return response;
   }
 
-  async updateOne(id, obj) {
+  async update(id, obj) {
     const response = await usersModel.updateOne({ _id: id }, obj);
     return response;
   }
 
-  async deleteOne(id) {
+  async delete(id) {
     const response = await usersModel.deleteOne({ _id: id });
     return response;
   }

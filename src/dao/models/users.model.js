@@ -27,10 +27,21 @@ const usersSchema = new mongoose.Schema({
     default: false
   },
   cart: {
-    type: [{ type: mongoose.SchemaTypes.ObjectId, ref: "carts" }],
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"carts"
+
   },
   role: {
     type: String
+  },
+  orders: {
+    type: [
+      {
+        type:mongoose.SchemaTypes.ObjectId,
+        ref:"Orders"
+      }
+    ],
+    default:[]
   }
 });
 

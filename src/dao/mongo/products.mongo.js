@@ -1,7 +1,7 @@
-import { productsModel } from "./models/products.model.js";
+import { productsModel } from "../models/products.model.js";
 
-class ProductsManager {
-  async findAll({limit = 10, page = 1, sort = {}, query = {} } = {}) {
+export default class ProductsManager {
+  async get({limit = 10, page = 1, sort = {}, query = {} } = {}) {
     
     const sortOptions = {
       "asc": {price:1},
@@ -38,17 +38,17 @@ class ProductsManager {
     return result;
   }
 
-  async createOne(obj) {
+  async create(obj) {
     const result = await productsModel.create(obj);
     return result;
   }
 
-  async updateOne(id, obj) {
+  async update(id, obj) {
     const result = await productsModel.updateOne({ _id: id }, obj);
     return result;
   }
 
-  async deleteOne(id) {
+  async delete(id) {
     const result = await productsModel.deleteOne({ _id: id });
     return result;
   }

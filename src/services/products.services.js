@@ -1,8 +1,8 @@
-import { productsManager } from "../dao/products.dao.js"
+import { productsManager } from "../dao/mongo/products.mongo.js"
 
 
 export const findAllProducts = (obj) => {
-    const users = productsManager.findAll(obj)
+    const users = productsManager.find(obj)
     return users
 }
 
@@ -12,16 +12,16 @@ export const findProductById = (id) => {
 }
 
 export const upDateProductById = (pid,data) => {
-    const user = productsManager.updateOne(pid,data)
+    const user = productsManager.update(pid,data)
     return user
 }
 
 export const create = (data) => {
-    const user = productsManager.createOne(data)
+    const user = productsManager.create(data)
     return user
 }
 
 export const deleteProductById = (id) => {
-    const user = productsManager.deleteOne(id)
+    const user = productsManager.delete(id)
     return user
 }

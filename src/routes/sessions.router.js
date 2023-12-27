@@ -1,12 +1,16 @@
 import { Router } from "express";
 import { generateToken } from "../utils.js";
 import passport from "passport";
+import UserResponse from "../dto/users-response.dto.js"
+import {usersManager} from "../dao/mongo/users.mongo.js";
 
 const router = Router()
 
 router.get("/current", passport.authenticate("jwt", {session: false}), async(req,res)=>{
     const user = req.user
-    res.json({user})
+    console.log("user",user)
+    const userDTO = new UserResponse(user)
+    res.json({userDTO})
     
 })
 
@@ -15,8 +19,10 @@ router.post("/signup",passport.authenticate("signup"), async(req,res)=>{
 })
 
 router.post("/login",passport.authenticate("login"), async(req,res)=>{
-    const {first_name,email} = req.body
-    const token = generateToken({first_name,email});
+    const {email} = req.body
+    const user = await usersManager.findByEmail(email)
+    console.log("user",user)
+    const token = generateToken({user});
     res.cookie("token", token, { maxAge: 60000, httpOnly: true }).send("Welcome");
 })
 

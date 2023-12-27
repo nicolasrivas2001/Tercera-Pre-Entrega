@@ -1,21 +1,23 @@
-import { cartsModel } from "./models/carts.model.js";
+import { cartsModel } from "../models/carts.model.js";
+import { ticketsManager } from "./tickets.mongo.js"
+import {v4 as uuidv4} from "uuid"
 
-class CartsManager {
+export default class CartsManager {
 
-  async findAll(){
+  async get(){
     const response = await cartsModel.find()
     return response;
   }
-  async createCart() {
+  async create() {
     const newCart = { products: [] };
     const response = await cartsModel.create(newCart);
     return response;
   }
 
-  async findCartById(idCart) {
+  async findById(idCart) {
     const response = await cartsModel
       .findById(idCart)
-      .populate("products.product", ["name", "price"]);
+      .populate("products.product");
     return response;
   }
 
@@ -49,13 +51,12 @@ class CartsManager {
     return cart.save();
   }
 
-  async cartUpdate(idCart,newProducts){
+  async update(idCart,newProducts){
     const cart = await cartsModel.findById(idCart);
     if(!cart){
       return("Carrito No Existente")
     }
     cart.products = newProducts.products
-    console.log(newProducts.products)
     return cart.save();
   }
  
@@ -84,6 +85,43 @@ class CartsManager {
     cart.products = []
     return cart.save();
   }
+
+  async delete (id){
+    const cart = await cartsModel.delete(id)
+    return cart
+  }
+ 
+  async purchase (idCart,user) {
+    const cart = await cartsModel.findById(idCart).populate("products.product");
+    const products = cart.products
+    let avaiableProducts = []
+    let unavaiableProducts = []
+    let totalAmount = 0
+    for (let item of products){
+        if(item.product.stock >= item.quantity){
+            avaiableProducts.push(item)
+            item.product.stock -=item.quantity
+            await item.product.save()
+            totalAmount += item.quantity * item.product.price
+        } else {
+            unavaiableProducts.push(item)
+        }
+    }
+    cart.products = unavaiableProducts
+    await cart.save()
+    if (avaiableProducts.length){
+        const ticket = {
+            code: uuidv4(),
+            purchase_datatime: new Date(),
+            amount: totalAmount,
+            purchaser: user.user.email
+        }
+        await ticketsManager.createTicket(ticket)
+        return {avaiableProducts, totalAmount}
+    }
+    return {unavaiableProducts}
+    
+}
 
 }
 

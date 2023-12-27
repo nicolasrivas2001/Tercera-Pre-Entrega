@@ -6,7 +6,7 @@ import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/cart.router.js"
 import usersRouter from "./routes/users.router.js"
 import sessionsRouter from "./routes/sessions.router.js"
-import { productsManager } from "./dao/products.dao.js";
+import { productsManager } from "./dao//mongo/products.mongo.js";
 import session from "express-session";
 import { Server } from "socket.io";
 import "./dao/configDB.js";
@@ -53,8 +53,8 @@ app.use("/api/sessions", sessionsRouter);
 
 
 
-const httpServer = app.listen(8088, () => {
-  console.log("Server is listening on port 8088");
+const httpServer = app.listen(8080, () => {
+  console.log("Server is listening on port 8080");
 });
 
 const socketServer = new Server(httpServer);
