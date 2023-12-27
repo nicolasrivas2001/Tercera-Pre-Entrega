@@ -6,6 +6,7 @@ import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/cart.router.js"
 import usersRouter from "./routes/users.router.js"
 import sessionsRouter from "./routes/sessions.router.js"
+import messagesRouter from "./routes/messages.router.js"
 import { productsManager } from "./dao//mongo/products.mongo.js";
 import session from "express-session";
 import { Server } from "socket.io";
@@ -47,6 +48,7 @@ app.use("/", viewsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionsRouter);
+app.use("/api/messages", messagesRouter);
 
 
 
