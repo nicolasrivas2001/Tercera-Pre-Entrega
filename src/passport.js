@@ -79,7 +79,7 @@ passport.use("github", new GithubStrategy({
     callbackURL:"http://localhost:8080/api/sessions/callback"
 }, async(accessToke, refreshToken, profile, done) => {
     try{
-        console.log(profile)
+        console.log("profile",profile)
         const userDB = await usersManager.findByEmail(profile._json.email)
         console.log(userDB)
         if(userDB){
